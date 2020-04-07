@@ -20,4 +20,11 @@ $ npm start
 $ npm run generate
 ```
 
+### Deploy to GH pages
+
+1) Open *package.json* and modify the upstream to your fork in scripts deploy
+2) run
+
+		npm run deploy
+		
 For detailed explanation on how things work, checkout the [Nuxt.js docs](https://github.com/nuxt/nuxt.js).
