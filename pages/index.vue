@@ -210,8 +210,8 @@
 
 <script>
 import {deleteSolve, saveSolve} from '~/lib/db.js';
-import {formatTime, getNotation} from '~/lib/utils.js';
-import GiiKER from '~/lib/giiker.js';
+import {formatTime, getNotation, getUniformNotationWithPrime} from '~/lib/utils.js';
+import Gancube from '~/lib/gan.js';
 import MoveSequence from '~/lib/MoveSequence.js';
 import NoSleep from 'nosleep.js';
 import SolveAnalyzer from '~/lib/SolveAnalyzer.js';
@@ -316,14 +316,14 @@ export default {
 		if (process.browser) {
 			this.noSleep = new NoSleep();
 		}
-		this.isGiikerConnected = GiiKER.isConnected;
-		if (GiiKER.isConnected) {
-			if (GiiKER.cube.isSolved()) {
+		this.isGiikerConnected = Gancube.isConnected;
+		if (Gancube.isConnected) {
+			if (Gancube.cube.isSolved()) {
 				this.phase = 'scramble';
 			} else {
 				this.phase = 'prescramble';
 			}
-			GiiKER.on('move', this.onGiikerMove);
+			Gancube.on('move', this.onGiikerMove);
 		}
 	},
 	mounted() {
@@ -340,8 +340,8 @@ export default {
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
-		if (GiiKER.isConnected) {
-			GiiKER.off('move', this.onGiikerMove);
+		if (Gancube.isConnected) {
+			Gancube.off('move', this.onGiikerMove);
 		}
 		if (this.noSleep) {
 			this.noSleep.disable();
@@ -358,10 +358,9 @@ export default {
 			}
 
 			this.isConnecting = true;
-
-			GiiKER.connect().then(() => {
+			Gancube.connect().then(() => {
 				this.isGiikerConnected = true;
-				GiiKER.on('move', this.onGiikerMove);
+				Gancube.on('move', this.onGiikerMove);
 				this.phase = 'scramble';
 			}, (error) => {
 				this.isSnackbarShown = true;
@@ -378,7 +377,7 @@ export default {
 			const now = new Date();
 
 			if (this.phase === 'prescramble') {
-				if (GiiKER.cube.isSolved()) {
+				if (Gancube.cube.isSolved()) {
 					this.phase = 'scramble';
 				}
 				return;
@@ -386,8 +385,8 @@ export default {
 
 			if (this.phase === 'scramble') {
 				this.scramble.unshift({
-					face: move.face,
-					amount: -move.amount,
+					face: move.latestMove.family,
+					amount: -move.latestMove.amount,
 				});
 				if (this.scramble.length > this.placeholderMoves.length) {
 					this.placeholderMoves = this.scramble.moves.map((m) => ({...m}));
@@ -418,10 +417,11 @@ export default {
 			}
 
 			if (this.phase === 'solve') {
+				console.log("Starting to solve")
 				this.time = now.getTime() - this.startTime.getTime();
 				this.analyzer.pushMoves([{time: this.time, ...move}]);
 
-				if (GiiKER.cube.isSolved()) {
+				if (Gancube.cube.isSolved()) {
 					this.finishSolve({isError: false});
 				}
 			}
@@ -517,5 +517,5 @@ export default {
 		flex: 1 1 0;
 		padding-top: 0 !important;
 		overflow-y: auto;
-	}
+	} 
 </style>
