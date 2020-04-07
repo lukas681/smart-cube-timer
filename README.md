@@ -1,6 +1,6 @@
-# smart-cube-timer
+# Smart Cube Timer
 
-> Proof-of-concept smart timer for GiiKER
+This is a fork of the smart-cube-timer by hakatashi with support for the GAN 365i. 
 
 ## Build Setup
 
